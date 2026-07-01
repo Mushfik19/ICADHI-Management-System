@@ -1,16 +1,95 @@
-# React + Vite
+# ICADHI Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Monorepo-style scaffold for a real-world ICADHI conference management platform.
 
-Currently, two official plugins are available:
+Current repository areas:
+- `frontend/`: React/Vite UI scaffold with separate pages, components, layouts, hooks, and routes
+- `backend/`: Node backend scaffold with controllers, routes, services, Prisma schema, and socket structure
+- `database/`: database notes and planning
+- `docs/`: architecture documentation
+- `docker/`: container scaffolding
+- `scripts/`: utility scripts
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Run Locally With MySQL, Backend, And Frontend
 
-## React Compiler
+1. Open MySQL Workbench and create the database:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```sql
+CREATE DATABASE icadhi CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
 
-## Expanding the Oxlint configuration
+2. Update `.env` with your real MySQL password:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+```env
+DATABASE_URL=mysql://root:your_mysql_password@127.0.0.1:3306/icadhi
+PORT=4000
+```
+
+3. Install dependencies and prepare Prisma:
+
+```powershell
+npm.cmd install
+npm.cmd --prefix backend run db:generate
+npm.cmd --prefix backend run db:push
+npm.cmd --prefix backend run db:seed
+```
+
+4. Start backend and frontend together:
+
+```powershell
+npm.cmd run dev
+```
+
+Frontend: `http://127.0.0.1:5173`
+
+Backend: `http://127.0.0.1:4000`
+
+## Launch Checklist
+
+Before launch, run:
+
+```powershell
+npm.cmd run check
+```
+
+This verifies:
+- backend `.env` exists and points to MySQL
+- Prisma can connect to MySQL
+- all important `/api/*` module routes respond
+- backend route tests pass
+- both frontend builds pass
+- lint passes
+
+Important environment files:
+- Copy `backend/.env.example` to `backend/.env`
+- Keep real passwords only in `backend/.env`
+- Do not commit `.env` or `backend/.env`
+
+Useful commands:
+
+```powershell
+npm.cmd --prefix backend run db:generate
+npm.cmd --prefix backend run db:push
+npm.cmd --prefix backend run db:seed
+npm.cmd run dev
+```
+
+Admin login defaults for local testing:
+
+```text
+Email: mushfik.cse@gmail.com
+Password: 1324
+```
+
+Security notes:
+- Do not expose login credentials in the UI.
+- Do not store plaintext passwords in production data files.
+- Use backend authentication, hashed passwords, JWT, refresh tokens, and role-based access control.
+
+Recommended next implementation order:
+1. Backend authentication and RBAC
+2. Frontend route wiring and protected layouts
+3. Participant management
+4. QR scanning and attendance
+5. Sessions, speakers, and workshops
+6. Reports, finance, notifications, and AI health modules

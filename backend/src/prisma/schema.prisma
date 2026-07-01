@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique
+  users       User[]
+  permissions Permission[]
+}
+
+model Permission {
+  id     Int    @id @default(autoincrement())
+  name   String @unique
+  roleId Int
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id           Int        @id @default(autoincrement())
+  fullName     String
+  institution  String?
+  phone        String?
+  email        String     @unique
+  passwordHash String
+  status       String     @default("approved")
+  roleId       Int
+  role         Role       @relation(fields: [roleId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  auditLogs    AuditLog[]
+}
+
+model Participant {
+  id              Int       @id @default(autoincrement())
+  fullName        String
+  institution     String?
+  country         String?
+  email           String    @unique
+  phone           String?
+  category        String?
+  registrationRef String?   @unique
+  createdAt       DateTime  @default(now())
+  qrScans         QRScan[]
+}
+
+model Session {
+  id        Int      @id @default(autoincrement())
+  title     String
+  hall      String?
+  startTime DateTime?
+  endTime   DateTime?
+  capacity  Int?
+  createdAt DateTime @default(now())
+}
+
+model Workshop {
+  id        Int      @id @default(autoincrement())
+  title     String
+  capacity  Int?
+  startTime DateTime?
+  endTime   DateTime?
+  createdAt DateTime @default(now())
+}
+
+model QRScan {
+  id            Int         @id @default(autoincrement())
+  participantId Int
+  scanType      String
+  scannedAt     DateTime    @default(now())
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  channel   String
+  title     String
+  message   String
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  action     String
+  entityType String
+  entityId   String?
+  ipAddress  String?
+  device     String?
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Setting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ActionRecord {
+  id          Int      @id @default(autoincrement())
+  module      String
+  action      String
+  requestedBy String
+  status      String
+  details     String?  @db.Text
+  createdAt   DateTime @default(now())
+}
+
+model ModuleRecord {
+  id        Int      @id @default(autoincrement())
+  resource  String
+  payload   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

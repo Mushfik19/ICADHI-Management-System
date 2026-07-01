@@ -1,0 +1,21 @@
+{
+  "name": "icadhi-management-backend",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Backend scaffold for the ICADHI management system",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node src/server.js",
+    "start": "node src/server.js",
+    "db:generate": "prisma generate --schema src/prisma/schema.prisma",
+    "db:push": "prisma db push --schema src/prisma/schema.prisma",
+    "db:seed": "node src/prisma/seed.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.1.0",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "prisma": "^6.1.0"
+  }
+}
