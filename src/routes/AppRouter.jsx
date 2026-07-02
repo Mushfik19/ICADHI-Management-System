@@ -418,9 +418,13 @@ export function AppRouter() {
             auth={auth}
             route={route}
           />
-        )
+      )
     }
   }, [auth, protectedRoute, registrationStats.rows, route, schedule.rows])
+
+  if (!auth.currentUser) {
+    return <AuthPage auth={auth} />
+  }
 
   return (
     <MainLayout

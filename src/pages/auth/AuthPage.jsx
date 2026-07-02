@@ -1,41 +1,110 @@
+import { useState } from 'react'
+
 export function AuthPage({ auth }) {
+  const [organizerMode, setOrganizerMode] = useState('login')
+
+  const setLoginRole = (role) => {
+    auth.updateLoginField({ target: { name: 'role', value: role } })
+    if (role === 'organizer') {
+      setOrganizerMode('login')
+    }
+  }
+
+  const isAdmin = auth.loginForm.role === 'admin'
+  const isOrganizerLogin = auth.loginForm.role === 'organizer' && organizerMode === 'login'
+  const isOrganizerSignup = auth.loginForm.role === 'organizer' && organizerMode === 'signup'
+
   return (
-    <>
-      <header className="hero-card">
-        <div className="hero-copy">
-          <span className="eyebrow">Authentication route</span>
-          <h2>Secure admin login and organizer approval flow</h2>
-          <p>
-            Create an organizer account, then let the admin approve it before you can access protected congress operations.
-          </p>
-          <p className="auth-helper">
-            Demo admin account: <strong>{auth.adminCredentials.email}</strong>
-          </p>
+    <main className="access-shell">
+      <nav className="access-nav" aria-label="Login navigation">
+        <div className="access-brand">
+          <span className="access-logo">I</span>
+          <div>
+            <strong>ICADHI 2026</strong>
+            <span>International Congress on AI and Digital Health</span>
+          </div>
+        </div>
+        <div className="access-nav__actions">
+          <button
+            type="button"
+            className={isAdmin ? 'access-tab is-active access-tab--muted' : 'access-tab access-tab--muted'}
+            onClick={() => setLoginRole('admin')}
+          >
+            Admin Login
+          </button>
+          <button
+            type="button"
+            className={!isAdmin ? 'access-tab is-active' : 'access-tab'}
+            onClick={() => setLoginRole('organizer')}
+          >
+            Organizer Login or Signup
+          </button>
+        </div>
+      </nav>
+
+      <section className="access-grid">
+        <div className="access-hero">
+          <span className="eyebrow">International Congress on AI and Digital Health</span>
+          <h1>Admin controlled organizer access.</h1>
+          <p>Hello organizers!</p>
+          <div className="access-info-grid">
+            <article>
+              <span>Secure Access</span>
+              <strong>Admin Controlled</strong>
+              <p>Every organizer account is verified before access is granted.</p>
+            </article>
+            <article>
+              <span>Review Queue</span>
+              <strong>Pending Requests</strong>
+              <p>Organizer signup requests remain pending until approved by the administrator.</p>
+            </article>
+          </div>
         </div>
 
-        <div className="auth-panel">
-          <div className="split-grid">
-            <form className="auth-form" onSubmit={auth.handleLogin}>
-              <span className="eyebrow">Login</span>
+        <div className="access-panel">
+          <div className="access-panel__header">
+            <div>
+              <span className="eyebrow">{isAdmin ? 'Administrator' : 'Internal Organizer'}</span>
+              <h2>{isAdmin ? 'Admin login' : 'Organizer access request'}</h2>
+            </div>
+            <span className="access-badge">{isAdmin ? 'Secure Admin' : 'Stored Locally'}</span>
+          </div>
+
+          {!isAdmin && (
+            <div className="access-switch" role="group" aria-label="Organizer access mode">
+              <button
+                type="button"
+                className={isOrganizerLogin ? 'is-active' : ''}
+                onClick={() => {
+                  setLoginRole('organizer')
+                  setOrganizerMode('login')
+                }}
+              >
+                Organizer Login
+              </button>
+              <button
+                type="button"
+                className={isOrganizerSignup ? 'is-active' : ''}
+                onClick={() => {
+                  setLoginRole('organizer')
+                  setOrganizerMode('signup')
+                }}
+              >
+                Organizer Signup
+              </button>
+            </div>
+          )}
+
+          {(isAdmin || isOrganizerLogin) && (
+            <form className="access-form" onSubmit={auth.handleLogin}>
               <label>
-                Login type
-                <select
-                  name="role"
-                  value={auth.loginForm.role}
-                  onChange={auth.updateLoginField}
-                >
-                  <option value="admin">Admin</option>
-                  <option value="organizer">Organizer</option>
-                </select>
-              </label>
-              <label>
-                Email
+                {isAdmin ? 'Admin email' : 'Organizer email'}
                 <input
                   type="email"
                   name="email"
                   value={auth.loginForm.email}
                   onChange={auth.updateLoginField}
-                  placeholder="Enter email"
+                  placeholder={isAdmin ? auth.adminCredentials.email : 'organizer@icadhi.org'}
                 />
               </label>
               <label>
@@ -45,16 +114,17 @@ export function AuthPage({ auth }) {
                   name="password"
                   value={auth.loginForm.password}
                   onChange={auth.updateLoginField}
-                  placeholder="Enter password"
+                  placeholder={isAdmin ? 'Enter admin password' : 'Enter organizer password'}
                 />
               </label>
-              <button type="submit" className="submit-button">
-                Login
+              <button type="submit" className="access-submit">
+                {isAdmin ? 'Sign in as admin' : 'Sign in as organizer'}
               </button>
             </form>
+          )}
 
-            <form className="auth-form" onSubmit={auth.handleSignup}>
-              <span className="eyebrow">Organizer signup</span>
+          {isOrganizerSignup && (
+            <form className="access-form access-form--signup" onSubmit={auth.handleSignup}>
               <label>
                 Full name
                 <input
@@ -105,31 +175,15 @@ export function AuthPage({ auth }) {
                   placeholder="Create password"
                 />
               </label>
-              <button type="submit" className="submit-button">
-                Sign up for approval
+              <button type="submit" className="access-submit">
+                Submit organizer request
               </button>
             </form>
-          </div>
+          )}
 
-          <div className="status-banner">{auth.message}</div>
-        </div>
-      </header>
-      <section className="auth-visual">
-        <div className="auth-visual__card">
-          <span className="eyebrow">Authentication flow</span>
-          <h3>Secure login, approval flow, and access control</h3>
-          <p>
-            The authentication experience is the secure gateway to the entire ICADHI congress management platform.
-          </p>
-          <div className="chip-list">
-            {['Login', 'Forgot Password', 'Reset Password', 'OTP Verification', 'Create New Password'].map((item) => (
-              <span key={item} className="chip">
-                {item}
-              </span>
-            ))}
-          </div>
+          <div className="access-message">{auth.message}</div>
         </div>
       </section>
-    </>
+    </main>
   )
 }

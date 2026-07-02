@@ -172,7 +172,7 @@ export function useAuth(seedOrganizers = []) {
       })
       setLoginForm(initialLoginForm)
       setMessage(data.message || 'Login successful.')
-      window.location.hash = resolvedRole === 'admin' ? '/admin' : '/dashboard'
+      window.location.hash = '/dashboard'
       return true
     } catch (error) {
       if (loginForm.role === 'admin') {
@@ -192,7 +192,7 @@ export function useAuth(seedOrganizers = []) {
         })
         setLoginForm(initialLoginForm)
         setMessage('Admin login successful. You can now approve organizers and manage protected modules.')
-        window.location.hash = '/admin'
+        window.location.hash = '/dashboard'
         return true
       }
 
@@ -217,7 +217,7 @@ export function useAuth(seedOrganizers = []) {
       })
       setLoginForm(initialLoginForm)
       setMessage('Organizer login successful. Only organizer-safe modules are available.')
-      window.location.hash = '/organizer'
+      window.location.hash = '/dashboard'
       return true
     }
   }
